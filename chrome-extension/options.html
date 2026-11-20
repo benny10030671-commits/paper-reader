@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Chrome 連線設定 · 論文伴讀</title><link rel="stylesheet" href="style.css"></head>
+<body><main class="card">
+  <header><span class="mark">伴</span><span>論文伴讀 · Chrome 設定</span></header>
+  <h1>在 Chrome 遇見下一篇論文</h1>
+  <p>點選開啟 PDF 時，會自動檢查並啟動論文伴讀，不必先開桌面捷徑。</p>
+  <form id="form">
+    <label class="field"><span>論文伴讀連接埠</span><input id="port" type="number" min="1024" max="65535" required></label>
+    <p class="hint">預設為 8791；請與閱讀器網址中的數字一致。</p>
+    <label class="field check"><input id="auto" type="checkbox">開啟 PDF 時自動提示</label>
+    <button class="primary" type="submit">儲存設定</button>
+  </form>
+  <button id="test-launch" class="secondary" type="button">測試自動啟動</button>
+  <p id="status" role="status" aria-live="polite"></p>
+  <details>
+    <summary>第一次使用或更換電腦：安裝自動啟動元件</summary>
+    <p>Windows：在論文伴讀程式資料夾雙擊 <strong>install-browser-launcher.cmd</strong>，依提示貼上下方識別碼。只需要安裝一次，完成後重新載入擴充功能。</p>
+    <p>這個擴充功能的識別碼：<code id="extension-id"></code></p>
+  </details>
+  <p class="hint">只在你點選開啟後，才把 PDF 傳到這台電腦的論文伴讀。擴充功能不會將瀏覽紀錄傳到外部服務。匯入後，閱讀器會依你的既有設定執行 AI 分析。</p>
+  <script type="module" src="options.js"></script>
+</main></body></html>

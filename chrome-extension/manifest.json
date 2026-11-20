@@ -1,0 +1,12 @@
+{
+  "manifest_version": 3,
+  "name": "論文伴讀：用閱讀器開啟 PDF",
+  "version": "1.3.0",
+  "description": "在 PDF 左下角顯示「用論文伴讀開啟」，一鍵匯入本機書庫。",
+  "minimum_chrome_version": "127",
+  "permissions": ["storage", "tabs", "webRequest", "scripting", "nativeMessaging"],
+  "host_permissions": ["http://*/*", "https://*/*", "file:///*"],
+  "background": { "service_worker": "background.js", "type": "module" },
+  "action": { "default_title": "用論文伴讀開啟 PDF", "default_popup": "popup.html" },
+  "options_page": "options.html"
+}

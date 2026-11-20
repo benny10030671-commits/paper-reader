@@ -1,0 +1,33 @@
+:root { font: 15px/1.65 system-ui, "Microsoft JhengHei", sans-serif; color: #27243a; background: #f5f3fb; color-scheme: light; }
+* { box-sizing: border-box; }
+body { margin: 0; }
+.popup { width: 360px; padding: 22px; background: #fff; }
+.card { max-width: 560px; margin: 12vh auto 40px; padding: 36px; border: 1px solid #e7e2f2; border-radius: 20px; background: #fff; box-shadow: 0 14px 55px #40346b0a; }
+header { display: flex; align-items: center; gap: 10px; font-weight: 650; color: #645292; }
+.mark { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 10px; color: #fff; background: #6957bd; }
+.tag { margin-left: auto; font-size: 11px; letter-spacing: 1px; background: #f0edf9; padding: 2px 7px; border-radius: 4px; }
+h1 { font-size: 21px; line-height: 1.5; margin: 23px 0 10px; }
+p { margin: 10px 0 18px; color: #6d697a; }
+.filename { color: #554381; background: #f7f5fc; padding: 10px 12px; border-radius: 8px; overflow-wrap: anywhere; font-size: 13px; }
+.filename:empty { display: none; }
+button, input { font: inherit; }
+button { cursor: pointer; border: 0; border-radius: 9px; padding: 10px 14px; font-weight: 600; }
+button:focus-visible, input:focus-visible { outline: 3px solid #a597d9; outline-offset: 3px; }
+button:disabled { opacity: .5; cursor: default; }
+.primary, .secondary { width: 100%; margin-top: 8px; }
+.primary { background: #6957bd; color: #fff; }
+.primary:hover:not(:disabled) { background: #5946ac; }
+.secondary { background: #f3f1f7; color: #615a73; }
+.link { color: #6957bd; background: transparent; padding: 3px 0; font-size: 13px; }
+footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 22px; font-size: 12px; color: #777080; }
+label { cursor: pointer; }
+input[type=checkbox] { accent-color: #6957bd; vertical-align: middle; margin: 0 6px 0 0; }
+.field { display: block; margin: 18px 0 8px; }
+.field span { display: block; margin-bottom: 8px; }
+input[type=number] { width: 100%; border: 1px solid #d9d2e8; padding: 8px 12px; border-radius: 8px; }
+.hint { font-size: 12px; color: #80798c; }
+.error, #error { color: #a13449; overflow-wrap: anywhere; }
+.file-choice { margin: 24px 0 12px; border-top: 1px solid #eee9f5; padding-top: 18px; }
+.file-choice input { max-width: 100%; margin-top: 10px; font-size: 13px; }
+[hidden] { display: none !important; }
+@media (max-width: 600px) { .card { margin: 24px 16px; padding: 24px; } }

@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>論文伴讀</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%236a5acd'/%3E%3Cpath d='M19 7a9 9 0 1 0 6 15.5A8 8 0 0 1 19 7z' fill='%23fff'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf_viewer.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.11/katex.min.css">
+<link rel="stylesheet" href="/app.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/13.0.2/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.11/katex.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.11/contrib/auto-render.min.js"></script>
+</head>
+<body>
+<nav id="rail">
+  <a class="logo" href="#/" title="論文伴讀">
+    <svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="15" fill="var(--accent)"/><path d="M19 7a9 9 0 1 0 6 15.5A8 8 0 0 1 19 7z" fill="#fff"/></svg>
+  </a>
+  <a class="rail-btn" href="#/" data-icon="library" data-tip="書庫"></a>
+  <button class="rail-btn" id="btn-upload" data-icon="upload" data-tip="上傳 PDF"></button>
+  <span class="grow"></span>
+  <button class="rail-btn" id="btn-theme" data-icon="moon" data-tip="深色／淺色"></button>
+  <button class="rail-btn" id="btn-settings" data-icon="settings" data-tip="設定"></button>
+</nav>
+
+<main id="app">
+  <section id="library" hidden>
+    <div class="lib-wrap">
+      <header class="lib-head">
+        <div>
+          <h1>書庫</h1>
+          <p class="faint" id="lib-sub">上傳 PDF 後會自動產生摘要與關鍵字。所有資料只存在這台電腦。</p>
+        </div>
+        <div class="lib-head-acts">
+          <button class="ghost" id="btn-import" data-icon="link">用 DOI／PMID 匯入</button>
+          <button class="primary" id="btn-upload-2" data-icon="upload">上傳 PDF</button>
+        </div>
+      </header>
+      <div class="dropzone" id="dropzone">
+        <span data-icon="upload"></span>
+        <span>把 PDF 拖到這裡，或點擊選擇檔案</span>
+      </div>
+      <div id="lib-alert" hidden></div>
+      <div class="lib-bar">
+        <label class="lib-search">
+          <span data-icon="search"></span>
+          <input id="lib-q" type="search" placeholder="搜尋標題、作者、分類、摘要…（多個詞用空白隔開）" autocomplete="off" spellcheck="false">
+          <select id="lib-scope" title="搜尋範圍">
+            <option value="all">全部欄位</option>
+            <option value="title">標題</option>
+            <option value="author">作者</option>
+            <option value="category">分類</option>
+            <option value="summary">摘要／關鍵字</option>
+          </select>
+        </label>
+        <select id="lib-sort" title="排序">
+          <option value="opened">最近開啟</option>
+          <option value="added">最新加入</option>
+          <option value="year">出版年份</option>
+          <option value="title">標題 A–Z</option>
+        </select>
+      </div>
+      <div class="lib-body">
+        <aside class="lib-side" id="lib-side"></aside>
+        <div class="lib-results">
+          <div class="lib-filterbar"><div class="lib-filters" id="lib-filters"></div><span class="grow"></span><span class="faint small" id="lib-count"></span></div>
+          <div class="batch-bar" id="batch-bar" hidden></div>
+          <div id="lib-list"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="reader" hidden>
+    <header id="toolbar">
+      <a class="icon-btn" href="#/" data-icon="back" title="回書庫"></a>
+      <div class="tb-pop-wrap">
+        <button class="icon-btn" id="btn-outline" data-icon="list" title="目錄"></button>
+        <div class="popover" id="outline-pop" hidden></div>
+      </div>
+      <div class="doc-title" id="doc-title"></div>
+      <button class="icon-btn star-btn" id="btn-star" data-icon="star" title="加星號" aria-pressed="false"></button>
+      <select id="status-select" title="閱讀狀態" aria-label="閱讀狀態">
+        <option value="unread">未讀</option><option value="reading">閱讀中</option><option value="done">已讀</option>
+      </select>
+      <div class="search">
+        <span data-icon="search"></span>
+        <input id="search-input" placeholder="搜尋全文" autocomplete="off">
+        <span class="faint" id="search-count"></span>
+      </div>
+      <div class="tb-group">
+        <select id="zoom-select" title="縮放">
+          <option value="auto">自動縮放</option>
+          <option value="0.75">75%</option>
+          <option value="1">100%</option>
+          <option value="1.25">125%</option>
+          <option value="1.5">150%</option>
+          <option value="2">200%</option>
+          <option value="custom" hidden>—</option>
+        </select>
+        <button class="icon-btn" id="zoom-out" data-icon="minus" title="縮小"></button>
+        <button class="icon-btn" id="zoom-in" data-icon="plus" title="放大"></button>
+      </div>
+      <div class="tb-group page-nav">
+        <input id="page-input" inputmode="numeric"> <span class="faint">/ <span id="page-total">0</span></span>
+      </div>
+      <div class="tb-group rotation-controls" role="group" aria-label="頁面旋轉">
+        <button class="icon-btn" id="rotate-left" data-icon="rotate-left" title="此頁向左旋轉 90°" aria-label="此頁向左旋轉 90°"></button>
+        <button id="rotation-value" title="還原此頁方向" aria-label="還原此頁方向" disabled>0°</button>
+        <button class="icon-btn" id="rotate-right" data-icon="rotate-right" title="此頁向右旋轉 90°" aria-label="此頁向右旋轉 90°"></button>
+      </div>
+      <div class="tb-group">
+        <button class="tb-btn" id="btn-auto" data-icon="highlighter">自動高亮</button>
+        <button class="tb-btn" id="btn-fig" data-icon="scan">圖片說明</button>
+        <button class="tb-btn" id="btn-trans" data-icon="languages" title="把譯文直接蓋在原文位置上">版面翻譯<span class="tb-badge" id="trans-badge" hidden></span></button>
+        <button class="tb-btn" id="btn-sbs" data-icon="columns" title="左邊原文、右邊譯文，同步捲動">並排檢視</button>
+      </div>
+    </header>
+    <div id="workspace">
+      <div id="viewer"><div id="pages"></div></div>
+      <div id="resizer"></div>
+      <aside id="panel"><div id="panel-body"></div></aside>
+      <nav id="panel-rail"></nav>
+    </div>
+  </section>
+</main>
+
+<div id="sel-pop" hidden>
+  <div class="pop-bar">
+    <button data-act="translate" data-icon="languages">翻譯</button>
+    <button data-act="explain" data-icon="lightbulb">解釋</button>
+    <button data-act="ask" data-icon="message">問 AI</button>
+    <button data-act="cite" data-icon="quote" hidden>引用</button>
+    <span class="sep"></span>
+    <span class="dots">
+      <button class="dot" data-color="yellow" title="黃色高亮"></button>
+      <button class="dot" data-color="green" title="綠色高亮"></button>
+      <button class="dot" data-color="blue" title="藍色高亮"></button>
+      <button class="dot" data-color="pink" title="粉紅高亮"></button>
+      <button class="dot" data-color="purple" title="紫色高亮"></button>
+    </span>
+    <span class="sep"></span>
+    <button data-act="note" data-icon="note-add" title="加入筆記"></button>
+    <button data-act="copy" data-icon="copy" title="複製"></button>
+  </div>
+  <div class="pop-body" hidden></div>
+</div>
+
+<div id="drop-overlay" hidden><div>放開以上傳 PDF</div></div>
+<div id="toasts"></div>
+
+<dialog id="dlg-settings">
+  <form method="dialog">
+    <h2>設定</h2>
+    <p class="faint">AI 功能透過這台電腦上的 Claude Code CLI 執行，用量會計入你的 Claude 方案。
+      Opus 5.5 最強但最慢；effort 越高想得越久。只求速度時，翻譯用 Sonnet 5.5＋「不思考」最快。</p>
+    <div class="set-grid">
+      <div id="set-tasks"></div>
+      <label>背景同時執行數（重啟伺服器後生效）<input type="number" name="concurrency" min="1" max="8"></label>
+      <label class="check-field"><input type="checkbox" name="auto_translate">上傳後自動在背景翻譯全文（摘要完成後開始）</label>
+      <label class="check-field"><input type="checkbox" name="auto_classify">摘要完成後自動用 AI 歸入書庫分類</label>
+      <label class="wide-field">「存到 PaperBrain」的資料夾<input type="text" name="vault_dir" spellcheck="false"></label>
+      <div class="wide-field loc-field"><span>書庫位置（OneDrive／Google Drive 雲端同步）</span>
+        <div class="loc-row"><code id="set-loc"></code><button type="button" class="ghost" id="btn-cloud" data-icon="cloud">變更位置…</button></div>
+      </div>
+    </div>
+    <p class="faint small" id="set-info"></p>
+    <menu>
+      <button value="cancel" formnovalidate>取消</button>
+      <button value="ok" class="primary">儲存</button>
+    </menu>
+  </form>
+</dialog>
+
+<dialog id="dlg-import">
+  <form method="dialog">
+    <h2>用 DOI／PMID／PMCID 匯入</h2>
+    <p class="faint small">每行一筆：DOI（10.xxxx/…）、PMID、PMCID（PMC…）或論文網址。會依序試出版社的開放取用 PDF、PMC 開放取用資料集；
+      需要訂閱、或網站擋程式下載時，請在瀏覽器開啟後用 Chrome 擴充功能「用論文伴讀開啟」或直接拖曳 PDF。PMC 來源下載較慢（約 30–60 秒）。</p>
+    <textarea id="import-refs" rows="5" spellcheck="false" placeholder="10.1371/journal.pone.0285427&#10;38063640&#10;PMC10705966&#10;https://pubmed.ncbi.nlm.nih.gov/38028679/"></textarea>
+    <div id="import-log"></div>
+    <menu>
+      <button value="close" formnovalidate>關閉</button>
+      <button type="button" class="primary" id="import-go" data-icon="download">匯入（Ctrl+Enter）</button>
+    </menu>
+  </form>
+</dialog>
+
+<dialog id="dlg-cat">
+  <form method="dialog">
+    <h2 id="cat-dlg-title">新增分類</h2>
+    <div class="set-grid cat-fields">
+      <label class="wide-field">名稱<input name="name" maxlength="24" autocomplete="off" required></label>
+      <label class="wide-field">說明（選填；AI 分類時會參考）<input name="desc" maxlength="200" autocomplete="off"></label>
+    </div>
+    <menu>
+      <button value="cancel" formnovalidate>取消</button>
+      <button value="ok" class="primary">儲存</button>
+    </menu>
+  </form>
+</dialog>
+
+<dialog id="dlg-cloud">
+  <form method="dialog">
+    <h2>書庫位置與雲端同步</h2>
+    <p class="faint small">把書庫放進 OneDrive 或 Google Drive 電腦版正在同步的資料夾，就會由它們負責上傳、同步到你的其他電腦。論文伴讀本身不連線雲端，也不需要登入帳號。</p>
+    <div id="cloud-body"></div>
+    <menu><button value="close">關閉</button></menu>
+  </form>
+</dialog>
+
+<dialog id="dlg-confirm">
+  <form method="dialog">
+    <p id="confirm-msg"></p>
+    <menu>
+      <button value="cancel">取消</button>
+      <button value="ok" class="danger-btn">確定</button>
+    </menu>
+  </form>
+</dialog>
+
+<input type="file" id="file-input" accept="application/pdf,.pdf" multiple hidden>
+<script type="module" src="/app.js"></script>
+</body>
+</html>

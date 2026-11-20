@@ -1,0 +1,7 @@
+# per-machine library: PDFs, translations, notes, chat, settings
+data/
+.browser-launcher/
+
+__pycache__/
+*.pyc
+*.tmp
